@@ -3,6 +3,7 @@ include LICENSE
 include VERSION
 include *.rst
 include *.md
+include *.rst
 include demo/README
 include demo/demo.tls.dh
 include demo/*.py
@@ -40,6 +41,7 @@ exclude mypy.ini
 exclude sytest-blacklist
 exclude test_postgresql.sh
 
+include book.toml
 include pyproject.toml
 recursive-include changelog.d *
 
