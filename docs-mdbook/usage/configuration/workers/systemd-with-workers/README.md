@@ -13,7 +13,7 @@ The folder [workers](workers) contains an example configuration for the
 
 ## Synapse configuration files
 
-See [workers.md](../workers.md) for information on how to set up the
+See [workers.md](../../docs-mdbook/usage/configuration/workers.md) for information on how to set up the
 configuration files and reverse-proxy correctly. You can find an example worker
 config in the [workers](workers) folder.
 

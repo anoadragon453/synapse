@@ -86,7 +86,7 @@ save as it takes a while and is very resource intensive.
 
 ## Configuration file format
 
-The [sample configuration file](./sample_config.yaml) acts as a
+The [sample configuration file](../../docs/sample_config.yaml) acts as a
 reference to Synapse's configuration options for server administrators.
 Remember that many readers will be unfamiliar with YAML and server
 administration in general, so that it is important that the file be as

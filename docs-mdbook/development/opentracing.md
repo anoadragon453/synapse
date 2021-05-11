@@ -58,7 +58,7 @@ Latest documentation is probably at
 
 OpenTracing is not enabled by default. It must be enabled in the
 homeserver config by uncommenting the config options under `opentracing`
-as shown in the [sample config](./sample_config.yaml). For example:
+as shown in the [sample config](../../docs/sample_config.yaml). For example:
 
 ```yaml
 opentracing:

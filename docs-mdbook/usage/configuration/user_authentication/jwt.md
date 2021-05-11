@@ -53,7 +53,7 @@ as follows:
 
 To enable the JSON web token integration, you should then add an `jwt_config` section
 to your configuration file (or uncomment the `enabled: true` line in the
-existing section). See [sample_config.yaml](./sample_config.yaml) for some
+existing section). See [sample_config.yaml](../../../../docs/sample_config.yaml) for some
 sample settings.
 
 ## How to test JWT as a developer
