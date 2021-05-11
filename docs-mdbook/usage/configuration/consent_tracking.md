@@ -24,7 +24,7 @@ To enable this, first create templates for the policy and success pages.
 These should be stored on the local filesystem.
 
 These templates use the [Jinja2](http://jinja.pocoo.org) templating language,
-and [docs/privacy_policy_templates](privacy_policy_templates) gives
+and [docs/privacy_policy_templates](../../../docs/privacy_policy_templates) gives
 examples of the sort of thing that can be done.
 
 Note that the templates must be stored under a name giving the language of the

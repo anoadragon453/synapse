@@ -23,7 +23,7 @@ traffic to use a different port than 8448. For example, you might want to
 have your user names look like `@user:example.com`, but you want to run
 Synapse on `synapse.example.com` on port 443. This can be done using
 delegation, which allows an admin to control where federation traffic should
-be sent. See [delegate.md](delegate.md) for instructions on how to set this up.
+be sent. See [delegate.md](../setup/delegate.md) for instructions on how to set this up.
 
 Once federation has been configured, you should be able to join a room over
 federation. A good place to start is `#synapse:matrix.org` - a room for
