@@ -1,7 +1,7 @@
 # Summary
 
 - [Introduction](README.md)
-- [Setup]()
+- [Setup](setup/README.md)  # added
   - [Installation](setup/installation.md)
   - [Using Postgres](setup/postgres.md)
   - [Configuring a Reverse Proxy](setup/reverse_proxy.md)
@@ -9,12 +9,12 @@
   - [Delegation](setup/delegate.md)
 - [Upgrading](upgrading/README.md)
   - [Upgrading from pre-Synapse 1.0](upgrading/MSC1711_certificates_FAQ.md)
-- [Usage]()
+- [Usage](usage/README.md)  # added
   - [Federation](usage/federate.md)
-  - [Configuration]()
+  - [Configuration](usage/configuration/README.md)  # added
     - [Sample Configuration Files](usage/configuration/sample_config.md)
-    - [User Authentication]()
-      - [Single-Sign On]()
+    - [User Authentication](usage/configuration/user_authentication/README.md)  # added
+      - [Single Sign-On](usage/configuration/user_authentication/single_sign_on/README.md)  # added
         - [OpenID Connect](usage/configuration/user_authentication/single_sign_on/openid.md)
         - [SAML]()
         - [CAS]()
@@ -28,7 +28,7 @@
     - [URL Previews](usage/configuration/url_previews.md)
     - [User Directory](usage/configuration/user_directory.md)
     - [Message Retention Policies](usage/configuration/message_retention_policies.md)
-    - [Pluggable Modules]()
+    - [Pluggable Modules](usage/configuration/pluggable_modules/README.md)
       - [Third Party Rules]()
       - [Spam Checker](usage/configuration/pluggable_modules/spam_checker.md)
       - [Presence Router](usage/configuration/pluggable_modules/presence_router_module.md)
@@ -36,7 +36,7 @@
     - [Workers](usage/configuration/workers/workers.md)
       - [Using `synctl` with Workers](usage/configuration/workers/synctl_workers.md)
       - [Systemd](usage/configuration/workers/systemd-with-workers/README.md)
-  - [Administration](administration/README.md)
+  - [Administration](administration/README.md)  # added
     - [Admin API](usage/administration/admin_api/README.rst)
       - [Account Validity](usage/administration/admin_api/account_validity.rst)
       - [Delete Group](usage/administration/admin_api/delete_group.md)
@@ -56,7 +56,7 @@
     - [Monitoring](usage/administration/metrics-howto.md)
     - [Structured Logging](usage/administration/structured_logging.md)
     - [Scripts]()
-- [Development]()
+- [Development](development/README.md)  # added
   - [Contributing Guide](development/contributing_guide.md)
   - [Code Style](development/code_style.md)
   - [Git Usage](development/git.md)
@@ -66,7 +66,7 @@
     - [Log Contexts](development/synapse_architecture/log_contexts.md)
     - [Replication](development/synapse_architecture/replication.md)
     - [TCP Replication](development/synapse_architecture/tcp_replication.md)
-  - [Feature Documentation]()
+  - [Feature Documentation](development/feature_documentation/README.md)  # added
     - [Single-Sign On]()
       - [SAML](development/feature_documentation/single_sign_on/saml.md)
       - [CAS](development/feature_documentation/single_sign_on/cas.md)
@@ -75,5 +75,5 @@
     - [Media Repository](development/feature_documentation/media_repository.md)
     - [Room and User Statistics](development/feature_documentation/room_and_user_statistics.md)
   - [Scripts]()
-- [Other]()
+- [Other](other/README.md)  # added
   - [Dependency Deprecation Policy](other/deprecation_policy.md)
