@@ -27,6 +27,6 @@ site-url = "/synapse/"
 # Additional HTML, JS, CSS that's injected into each page of the book.
 # We currently use this to provide a table of contents to each page
 # via https://github.com/JorelAli/mdBook-pagetoc
-additional-css = ["docs-mdbook/book-assets/style.css"]
+additional-css = ["docs-mdbook/book-assets/style.css", "docs-mdbook/book-assets/remove-nav-buttons.css"]
 additional-js = ["docs-mdbook/book-assets/sidebar.js"]
 theme = "docs-mdbook/book-assets/theme"
