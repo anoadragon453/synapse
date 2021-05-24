@@ -32,8 +32,8 @@
     }
     .pagetoc a:hover,
     .pagetoc a.active {
-        background: var(--sidebar-bg);
-        color: var(--sidebar-fg);
+        background: var(--sidebar-bg) !important;
+        color: var(--sidebar-fg) !important;
     }
     .pagetoc .active {
         background: var(--sidebar-bg);
