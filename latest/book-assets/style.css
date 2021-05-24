@@ -17,6 +17,8 @@
     .pagetoc {
         position: fixed;
         width: 200px;
+        overflow: auto;
+        height: calc(100% - var(--menu-bar-height));
     }
     .pagetoc a {
         border-left: 1px solid var(--sidebar-bg);
@@ -30,8 +32,8 @@
     }
     .pagetoc a:hover,
     .pagetoc a.active {
-        background: var(--sidebar-bg) !important;
-        color: var(--sidebar-fg) !important;
+        background: var(--sidebar-bg);
+        color: var(--sidebar-fg);
     }
     .pagetoc .active {
         background: var(--sidebar-bg);
