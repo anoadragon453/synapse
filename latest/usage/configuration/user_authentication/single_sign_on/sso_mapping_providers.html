@@ -43,6 +43,10 @@
 
         <!-- Custom theme stylesheets -->
         
+        <link rel="stylesheet" href="../../../../docs-mdbook/book-assets/style.css">
+        
+        <link rel="stylesheet" href="../../../../docs-mdbook/book-assets/remove-nav-buttons.css">
+        
 
         
     </head>
@@ -173,6 +177,9 @@
 
                 <div id="content" class="content">
                     <main>
+                        <!-- Page table of contents -->
+                        <div class="sidetoc"><nav class="pagetoc"></nav></div>
+
                         <h1 id="sso-mapping-providers"><a class="header" href="#sso-mapping-providers">SSO Mapping Providers</a></h1>
 <p>A mapping provider is a Python class (loaded via a Python module) that
 works out how to map attributes of a SSO response to Matrix-specific
@@ -481,6 +488,8 @@ specified in the config. It is located at
         <script src="../../../../book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
+        
+        <script type="text/javascript" src="../../../../docs-mdbook/book-assets/sidebar.js"></script>
         
 
         

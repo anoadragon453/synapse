@@ -43,6 +43,10 @@
 
         <!-- Custom theme stylesheets -->
         
+        <link rel="stylesheet" href="../../../docs-mdbook/book-assets/style.css">
+        
+        <link rel="stylesheet" href="../../../docs-mdbook/book-assets/remove-nav-buttons.css">
+        
 
         
     </head>
@@ -173,6 +177,9 @@
 
                 <div id="content" class="content">
                     <main>
+                        <!-- Page table of contents -->
+                        <div class="sidetoc"><nav class="pagetoc"></nav></div>
+
                         <h3 id="using-synctl-with-workers"><a class="header" href="#using-synctl-with-workers">Using synctl with workers</a></h3>
 <p>If you want to use <code>synctl</code> to manage your synapse processes, you will need to
 create an an additional configuration file for the main synapse process. That
@@ -259,6 +266,8 @@ notifications.</p>
         <script src="../../../book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
+        
+        <script type="text/javascript" src="../../../docs-mdbook/book-assets/sidebar.js"></script>
         
 
         

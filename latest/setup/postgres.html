@@ -43,6 +43,10 @@
 
         <!-- Custom theme stylesheets -->
         
+        <link rel="stylesheet" href="../docs-mdbook/book-assets/style.css">
+        
+        <link rel="stylesheet" href="../docs-mdbook/book-assets/remove-nav-buttons.css">
+        
 
         
     </head>
@@ -173,6 +177,9 @@
 
                 <div id="content" class="content">
                     <main>
+                        <!-- Page table of contents -->
+                        <div class="sidetoc"><nav class="pagetoc"></nav></div>
+
                         <h1 id="using-postgres"><a class="header" href="#using-postgres">Using Postgres</a></h1>
 <p>Postgres version 9.5 or later is known to work.</p>
 <h2 id="install-postgres-client-libraries"><a class="header" href="#install-postgres-client-libraries">Install postgres client libraries</a></h2>
@@ -439,6 +446,8 @@ mv homeserver-postgres.yaml homeserver.yaml
         <script src="../book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
+        
+        <script type="text/javascript" src="../docs-mdbook/book-assets/sidebar.js"></script>
         
 
         

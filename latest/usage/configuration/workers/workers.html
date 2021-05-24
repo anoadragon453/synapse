@@ -43,6 +43,10 @@
 
         <!-- Custom theme stylesheets -->
         
+        <link rel="stylesheet" href="../../../docs-mdbook/book-assets/style.css">
+        
+        <link rel="stylesheet" href="../../../docs-mdbook/book-assets/remove-nav-buttons.css">
+        
 
         
     </head>
@@ -173,6 +177,9 @@
 
                 <div id="content" class="content">
                     <main>
+                        <!-- Page table of contents -->
+                        <div class="sidetoc"><nav class="pagetoc"></nav></div>
+
                         <h1 id="scaling-synapse-via-workers"><a class="header" href="#scaling-synapse-via-workers">Scaling synapse via workers</a></h1>
 <p>For small instances it recommended to run Synapse in the default monolith mode.
 For larger instances where performance is a concern it can be helpful to split
@@ -662,6 +669,8 @@ in systemd service files, but not required for synctl).</p>
         <script src="../../../book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
+        
+        <script type="text/javascript" src="../../../docs-mdbook/book-assets/sidebar.js"></script>
         
 
         

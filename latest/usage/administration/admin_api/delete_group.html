@@ -43,6 +43,10 @@
 
         <!-- Custom theme stylesheets -->
         
+        <link rel="stylesheet" href="../../../docs-mdbook/book-assets/style.css">
+        
+        <link rel="stylesheet" href="../../../docs-mdbook/book-assets/remove-nav-buttons.css">
+        
 
         
     </head>
@@ -173,6 +177,9 @@
 
                 <div id="content" class="content">
                     <main>
+                        <!-- Page table of contents -->
+                        <div class="sidetoc"><nav class="pagetoc"></nav></div>
+
                         <h1 id="delete-a-local-group"><a class="header" href="#delete-a-local-group">Delete a local group</a></h1>
 <p>This API lets a server admin delete a local group. Doing so will kick all
 users out of the group so that their clients will correctly handle the group
@@ -245,6 +252,8 @@ server admin: see <a href="README.rst">README.rst</a>.</p>
         <script src="../../../book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
+        
+        <script type="text/javascript" src="../../../docs-mdbook/book-assets/sidebar.js"></script>
         
 
         
