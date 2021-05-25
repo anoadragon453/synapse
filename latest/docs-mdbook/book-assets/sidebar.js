@@ -76,52 +76,55 @@ function setTocEntry() {
  */
 window.addEventListener('load', () => {
     // Only create table of contents if there is more than one header on the page
-    if (headers.length > 1) {
-        headers.forEach((header, index) => {
-            const link = document.createElement('a');
-
-            // Indent shows hierarchy
-            let indent = '0px';
-            switch (header.parentElement.tagName) {
-                case 'H1':
-                    indent = '5px';
-                    break;
-                case 'H2':
-                    indent = '20px';
-                    break;
-                case 'H3':
-                    indent = '30px';
-                    break;
-                case 'H4':
-                    indent = '40px';
-                    break;
-                case 'H5':
-                    indent = '50px';
-                    break;
-                case 'H6':
-                    indent = '60px';
-                    break;
-                default:
-                    break;
-            }
-
-            let tocEntry;
-            if (index == 0) {
-                // Create a bolded title for the first element
-                tocEntry = document.createElement("strong");
-                tocEntry.innerHTML = header.text;
-            } else {
-                // All other elements are non-bold
-                tocEntry = document.createTextNode(header.text);
-            }
-            link.appendChild(tocEntry);
-
-            link.style.paddingLeft = indent;
-            link.href = header.href;
-            pageToc.appendChild(link);
-        });
-        setTocEntry.call();
+    if (headers.length <= 1) {
+        return;
     }
+
+    // Create an entry in the page table of contents for each header in the document
+    headers.forEach((header, index) => {
+        const link = document.createElement('a');
+
+        // Indent shows hierarchy
+        let indent = '0px';
+        switch (header.parentElement.tagName) {
+            case 'H1':
+                indent = '5px';
+                break;
+            case 'H2':
+                indent = '20px';
+                break;
+            case 'H3':
+                indent = '30px';
+                break;
+            case 'H4':
+                indent = '40px';
+                break;
+            case 'H5':
+                indent = '50px';
+                break;
+            case 'H6':
+                indent = '60px';
+                break;
+            default:
+                break;
+        }
+
+        let tocEntry;
+        if (index == 0) {
+            // Create a bolded title for the first element
+            tocEntry = document.createElement("strong");
+            tocEntry.innerHTML = header.text;
+        } else {
+            // All other elements are non-bold
+            tocEntry = document.createTextNode(header.text);
+        }
+        link.appendChild(tocEntry);
+
+        link.style.paddingLeft = indent;
+        link.href = header.href;
+        pageToc.appendChild(link);
+    });
+    setTocEntry.call();
 });
 
 
