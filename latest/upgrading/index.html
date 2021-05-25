@@ -261,6 +261,21 @@ for example:</p>
 dpkg -i matrix-synapse-py3_1.3.0+stretch1_amd64.deb</p>
 </li>
 </ul>
+<h1 id="upgrading-to-v1340"><a class="header" href="#upgrading-to-v1340">Upgrading to v1.34.0</a></h1>
+<h2 id="room_invite_state_types-configuration-setting"><a class="header" href="#room_invite_state_types-configuration-setting"><code>room_invite_state_types</code> configuration setting</a></h2>
+<p>The <code>room_invite_state_types</code> configuration setting has been deprecated and
+replaced with <code>room_prejoin_state</code>. See the <code>sample configuration file &lt;https://github.com/matrix-org/synapse/blob/v1.34.0/docs/sample_config.yaml#L1515&gt;</code>_.</p>
+<p>If you have set <code>room_invite_state_types</code> to the default value you should simply
+remove it from your configuration file. The default value used to be:</p>
+<p>.. code:: yaml</p>
+<p>room_invite_state_types:
+- &quot;m.room.join_rules&quot;
+- &quot;m.room.canonical_alias&quot;
+- &quot;m.room.avatar&quot;
+- &quot;m.room.encryption&quot;
+- &quot;m.room.name&quot;</p>
+<p>If you have customised this value, you should remove <code>room_invite_state_types</code> and
+configure <code>room_prejoin_state</code> instead.</p>
 <h1 id="upgrading-to-v1330"><a class="header" href="#upgrading-to-v1330">Upgrading to v1.33.0</a></h1>
 <h2 id="account-validity-html-templates-can-now-display-a-users-expiration-date"><a class="header" href="#account-validity-html-templates-can-now-display-a-users-expiration-date">Account Validity HTML templates can now display a user's expiration date</a></h2>
 <p>This may affect you if you have enabled the account validity feature, and have made use of a

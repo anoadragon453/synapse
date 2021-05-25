@@ -215,22 +215,22 @@ through Jaeger's settings.</p>
 <h2 id="setting-up-opentracing"><a class="header" href="#setting-up-opentracing">Setting up OpenTracing</a></h2>
 <p>To receive OpenTracing spans, start up a Jaeger server. This can be done
 using docker like so:</p>
-<pre><code class="language-sh">docker run -d --name jaeger
+<pre><code class="language-sh">docker run -d --name jaeger \
   -p 6831:6831/udp \
   -p 6832:6832/udp \
   -p 5778:5778 \
   -p 16686:16686 \
   -p 14268:14268 \
-  jaegertracing/all-in-one:1.13
+  jaegertracing/all-in-one:1
 </code></pre>
 <p>Latest documentation is probably at
-<a href="https://www.jaegertracing.io/docs/1.13/getting-started/">https://www.jaegertracing.io/docs/1.13/getting-started/</a></p>
+https://www.jaegertracing.io/docs/latest/getting-started.</p>
 <h2 id="enable-opentracing-in-synapse"><a class="header" href="#enable-opentracing-in-synapse">Enable OpenTracing in Synapse</a></h2>
 <p>OpenTracing is not enabled by default. It must be enabled in the
 homeserver config by uncommenting the config options under <code>opentracing</code>
 as shown in the <a href="../../docs/sample_config.yaml">sample config</a>. For example:</p>
 <pre><code class="language-yaml">opentracing:
-  tracer_enabled: true
+  enabled: true
   homeserver_whitelist:
     - &quot;mytrustedhomeserver.org&quot;
     - &quot;*.myotherhomeservers.com&quot;
@@ -254,7 +254,7 @@ logged to OpenTracing's logs.</li>
 </ul>
 <h2 id="configuring-jaeger"><a class="header" href="#configuring-jaeger">Configuring Jaeger</a></h2>
 <p>Sampling strategies can be set as in this document:
-<a href="https://www.jaegertracing.io/docs/1.13/sampling/">https://www.jaegertracing.io/docs/1.13/sampling/</a></p>
+<a href="https://www.jaegertracing.io/docs/latest/sampling/">https://www.jaegertracing.io/docs/latest/sampling/</a>.</p>
 
                     </main>
 

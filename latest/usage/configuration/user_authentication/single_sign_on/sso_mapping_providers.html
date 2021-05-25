@@ -255,8 +255,8 @@ any option values they need here.</li>
 information from.</li>
 </ul>
 </li>
-<li>This method must return a string, which is the unique identifier for the
-user. Commonly the <code>sub</code> claim of the response.</li>
+<li>This method must return a string, which is the unique, immutable identifier
+for the user. Commonly the <code>sub</code> claim of the response.</li>
 </ul>
 </li>
 <li><code>map_user_attributes(self, userinfo, token, failures)</code>
@@ -282,7 +282,9 @@ with failures=1. The method should then return a different
 <li>Returns a dictionary with two keys:
 <ul>
 <li><code>localpart</code>: A string, used to generate the Matrix ID. If this is
-<code>None</code>, the user is prompted to pick their own username.</li>
+<code>None</code>, the user is prompted to pick their own username. This is only used
+during a user's first login. Once a localpart has been associated with a
+remote user ID (see <code>get_remote_user_id</code>) it cannot be updated.</li>
 <li><code>displayname</code>: An optional string, the display name for the user.</li>
 </ul>
 </li>
@@ -378,8 +380,8 @@ information from.</li>
 redirected to.</li>
 </ul>
 </li>
-<li>This method must return a string, which is the unique identifier for the
-user. Commonly the <code>uid</code> claim of the response.</li>
+<li>This method must return a string, which is the unique, immutable identifier
+for the user. Commonly the <code>uid</code> claim of the response.</li>
 </ul>
 </li>
 <li><code>saml_response_to_user_attributes(self, saml_response, failures, client_redirect_url)</code>
@@ -406,8 +408,10 @@ redirected to.</li>
 <p>This method must return a dictionary, which will then be used by Synapse
 to build a new user. The following keys are allowed:</p>
 <ul>
-<li><code>mxid_localpart</code> - The mxid localpart of the new user.  If this is
-<code>None</code>, the user is prompted to pick their own username.</li>
+<li><code>mxid_localpart</code> - A string, the mxid localpart of the new user. If this is
+<code>None</code>, the user is prompted to pick their own username. This is only used
+during a user's first login. Once a localpart has been associated with a
+remote user ID (see <code>get_remote_user_id</code>) it cannot be updated.</li>
 <li><code>displayname</code> - The displayname of the new user. If not provided, will default to
 the value of <code>mxid_localpart</code>.</li>
 <li><code>emails</code> - A list of emails for the new user. If not provided, will

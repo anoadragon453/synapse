@@ -642,7 +642,7 @@ failing, e.g.:</p>
 <p>If you have any other problems, feel free to ask in
 <a href="https://matrix.to/#/#synapse:matrix.org">#synapse:matrix.org</a>.</p>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="using-postgres"><a class="header" href="#using-postgres">Using Postgres</a></h1>
-<p>Postgres version 9.5 or later is known to work.</p>
+<p>Synapse supports PostgreSQL versions 9.6 or later.</p>
 <h2 id="install-postgres-client-libraries"><a class="header" href="#install-postgres-client-libraries">Install postgres client libraries</a></h2>
 <p>Synapse will require the python postgres client library in order to
 connect to a postgres database.</p>
@@ -676,86 +676,19 @@ Debian-derived distributions.</p>
 # Or, if your system uses sudo to get administrative rights
 sudo -u postgres bash
 </code></pre>
-<p>Then, create a user <code>synapse_user</code> with:</p>
-<pre><code>createuser --pwprompt synapse_user
+<p>Then, create a postgres user and a database with:</p>
+<pre><code># this will prompt for a password for the new user
+createuser --pwprompt synapse_user
+
+createdb --encoding=UTF8 --locale=C --template=template0 --owner=synapse_user synapse
 </code></pre>
-<p>Before you can authenticate with the <code>synapse_user</code>, you must create a
-database that it can access. To create a database, first connect to the
-database with your database user:</p>
-<pre><code>su - postgres # Or: sudo -u postgres bash
-psql
-</code></pre>
-<p>and then run:</p>
-<pre><code>CREATE DATABASE synapse
- ENCODING 'UTF8'
- LC_COLLATE='C'
- LC_CTYPE='C'
- template=template0
- OWNER synapse_user;
-</code></pre>
-<p>This would create an appropriate database named <code>synapse</code> owned by the
-<code>synapse_user</code> user (which must already have been created as above).</p>
+<p>The above will create a user called <code>synapse_user</code>, and a database called
+<code>synapse</code>.</p>
 <p>Note that the PostgreSQL database <em>must</em> have the correct encoding set
 (as shown above), otherwise it will not be able to store UTF8 strings.</p>
 <p>You may need to enable password authentication so <code>synapse_user</code> can
 connect to the database. See
 <a href="https://www.postgresql.org/docs/current/auth-pg-hba-conf.html">https://www.postgresql.org/docs/current/auth-pg-hba-conf.html</a>.</p>
-<p>If you get an error along the lines of <code>FATAL:  Ident authentication failed for user &quot;synapse_user&quot;</code>, you may need to use an authentication method other than
-<code>ident</code>:</p>
-<ul>
-<li>
-<p>If the <code>synapse_user</code> user has a password, add the password to the <code>database:</code>
-section of <code>homeserver.yaml</code>. Then add the following to <code>pg_hba.conf</code>:</p>
-<pre><code>host    synapse     synapse_user    ::1/128     md5  # or `scram-sha-256` instead of `md5` if you use that
-</code></pre>
-</li>
-<li>
-<p>If the <code>synapse_user</code> user does not have a password, then a password doesn't
-have to be added to <code>homeserver.yaml</code>. But the following does need to be added
-to <code>pg_hba.conf</code>:</p>
-<pre><code>host    synapse     synapse_user    ::1/128     trust
-</code></pre>
-</li>
-</ul>
-<p>Note that line order matters in <code>pg_hba.conf</code>, so make sure that if you do add a
-new line, it is inserted before:</p>
-<pre><code>host    all         all             ::1/128     ident
-</code></pre>
-<h3 id="fixing-incorrect-collate-or-ctype"><a class="header" href="#fixing-incorrect-collate-or-ctype">Fixing incorrect <code>COLLATE</code> or <code>CTYPE</code></a></h3>
-<p>Synapse will refuse to set up a new database if it has the wrong values of
-<code>COLLATE</code> and <code>CTYPE</code> set, and will log warnings on existing databases. Using
-different locales can cause issues if the locale library is updated from
-underneath the database, or if a different version of the locale is used on any
-replicas.</p>
-<p>The safest way to fix the issue is to take a dump and recreate the database with
-the correct <code>COLLATE</code> and <code>CTYPE</code> parameters (as shown above). It is also possible to change the
-parameters on a live database and run a <code>REINDEX</code> on the entire database,
-however extreme care must be taken to avoid database corruption.</p>
-<p>Note that the above may fail with an error about duplicate rows if corruption
-has already occurred, and such duplicate rows will need to be manually removed.</p>
-<h2 id="fixing-inconsistent-sequences-error"><a class="header" href="#fixing-inconsistent-sequences-error">Fixing inconsistent sequences error</a></h2>
-<p>Synapse uses Postgres sequences to generate IDs for various tables. A sequence
-and associated table can get out of sync if, for example, Synapse has been
-downgraded and then upgraded again.</p>
-<p>To fix the issue shut down Synapse (including any and all workers) and run the
-SQL command included in the error message. Once done Synapse should start
-successfully.</p>
-<h2 id="tuning-postgres"><a class="header" href="#tuning-postgres">Tuning Postgres</a></h2>
-<p>The default settings should be fine for most deployments. For larger
-scale deployments tuning some of the settings is recommended, details of
-which can be found at
-<a href="https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server">https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server</a>.</p>
-<p>In particular, we've found tuning the following values helpful for
-performance:</p>
-<ul>
-<li><code>shared_buffers</code></li>
-<li><code>effective_cache_size</code></li>
-<li><code>work_mem</code></li>
-<li><code>maintenance_work_mem</code></li>
-<li><code>autovacuum_work_mem</code></li>
-</ul>
-<p>Note that the appropriate values for those fields depend on the amount
-of free memory the database host has available.</p>
 <h2 id="synapse-config"><a class="header" href="#synapse-config">Synapse config</a></h2>
 <p>When you are ready to start using PostgreSQL, edit the <code>database</code>
 section in your config file to match the following lines:</p>
@@ -778,26 +711,45 @@ for a list of options which can be passed.</p>
 the connection between your homeserver and database dropping, otherwise Synapse
 may block for an extended period while it waits for a response from the
 database server. Example values might be:</p>
-<pre><code class="language-yaml"># seconds of inactivity after which TCP should send a keepalive message to the server
-keepalives_idle: 10
+<pre><code class="language-yaml">database:
+  args:
+    # ... as above
 
-# the number of seconds after which a TCP keepalive message that is not
-# acknowledged by the server should be retransmitted
-keepalives_interval: 10
+    # seconds of inactivity after which TCP should send a keepalive message to the server
+    keepalives_idle: 10
 
-# the number of TCP keepalives that can be lost before the client's connection
-# to the server is considered dead
-keepalives_count: 3
+    # the number of seconds after which a TCP keepalive message that is not
+    # acknowledged by the server should be retransmitted
+    keepalives_interval: 10
+
+    # the number of TCP keepalives that can be lost before the client's connection
+    # to the server is considered dead
+    keepalives_count: 3
 </code></pre>
+<h2 id="tuning-postgres"><a class="header" href="#tuning-postgres">Tuning Postgres</a></h2>
+<p>The default settings should be fine for most deployments. For larger
+scale deployments tuning some of the settings is recommended, details of
+which can be found at
+<a href="https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server">https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server</a>.</p>
+<p>In particular, we've found tuning the following values helpful for
+performance:</p>
+<ul>
+<li><code>shared_buffers</code></li>
+<li><code>effective_cache_size</code></li>
+<li><code>work_mem</code></li>
+<li><code>maintenance_work_mem</code></li>
+<li><code>autovacuum_work_mem</code></li>
+</ul>
+<p>Note that the appropriate values for those fields depend on the amount
+of free memory the database host has available.</p>
 <h2 id="porting-from-sqlite"><a class="header" href="#porting-from-sqlite">Porting from SQLite</a></h2>
 <h3 id="overview"><a class="header" href="#overview">Overview</a></h3>
 <p>The script <code>synapse_port_db</code> allows porting an existing synapse server
 backed by SQLite to using PostgreSQL. This is done in as a two phase
 process:</p>
 <ol>
-<li>Copy the existing SQLite database to a separate location (while the
-server is down) and running the port script against that offline
-database.</li>
+<li>Copy the existing SQLite database to a separate location and run
+the port script against that offline database.</li>
 <li>Shut down the server. Rerun the port script to port any data that
 has come in since taking the first snapshot. Restart server against
 the PostgreSQL database.</li>
@@ -844,6 +796,48 @@ mv homeserver-postgres.yaml homeserver.yaml
 ./synctl start
 </code></pre>
 <p>Synapse should now be running against PostgreSQL.</p>
+<h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
+<h3 id="alternative-auth-methods"><a class="header" href="#alternative-auth-methods">Alternative auth methods</a></h3>
+<p>If you get an error along the lines of <code>FATAL:  Ident authentication failed for user &quot;synapse_user&quot;</code>, you may need to use an authentication method other than
+<code>ident</code>:</p>
+<ul>
+<li>
+<p>If the <code>synapse_user</code> user has a password, add the password to the <code>database:</code>
+section of <code>homeserver.yaml</code>. Then add the following to <code>pg_hba.conf</code>:</p>
+<pre><code>host    synapse     synapse_user    ::1/128     md5  # or `scram-sha-256` instead of `md5` if you use that
+</code></pre>
+</li>
+<li>
+<p>If the <code>synapse_user</code> user does not have a password, then a password doesn't
+have to be added to <code>homeserver.yaml</code>. But the following does need to be added
+to <code>pg_hba.conf</code>:</p>
+<pre><code>host    synapse     synapse_user    ::1/128     trust
+</code></pre>
+</li>
+</ul>
+<p>Note that line order matters in <code>pg_hba.conf</code>, so make sure that if you do add a
+new line, it is inserted before:</p>
+<pre><code>host    all         all             ::1/128     ident
+</code></pre>
+<h3 id="fixing-incorrect-collate-or-ctype"><a class="header" href="#fixing-incorrect-collate-or-ctype">Fixing incorrect <code>COLLATE</code> or <code>CTYPE</code></a></h3>
+<p>Synapse will refuse to set up a new database if it has the wrong values of
+<code>COLLATE</code> and <code>CTYPE</code> set, and will log warnings on existing databases. Using
+different locales can cause issues if the locale library is updated from
+underneath the database, or if a different version of the locale is used on any
+replicas.</p>
+<p>The safest way to fix the issue is to dump the database and recreate it with
+the correct locale parameter (as shown above). It is also possible to change the
+parameters on a live database and run a <code>REINDEX</code> on the entire database,
+however extreme care must be taken to avoid database corruption.</p>
+<p>Note that the above may fail with an error about duplicate rows if corruption
+has already occurred, and such duplicate rows will need to be manually removed.</p>
+<h3 id="fixing-inconsistent-sequences-error"><a class="header" href="#fixing-inconsistent-sequences-error">Fixing inconsistent sequences error</a></h3>
+<p>Synapse uses Postgres sequences to generate IDs for various tables. A sequence
+and associated table can get out of sync if, for example, Synapse has been
+downgraded and then upgraded again.</p>
+<p>To fix the issue shut down Synapse (including any and all workers) and run the
+SQL command included in the error message. Once done Synapse should start
+successfully.</p>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="using-a-reverse-proxy-with-synapse"><a class="header" href="#using-a-reverse-proxy-with-synapse">Using a reverse proxy with Synapse</a></h1>
 <p>It is recommended to put a reverse proxy such as
 <a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html">nginx</a>,
@@ -1223,7 +1217,7 @@ turn_allow_guests: True
 </ul>
 <p>... and then reload any clients (or wait an hour for them to refresh their
 settings).</p>
-<h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
+<h2 id="troubleshooting-1"><a class="header" href="#troubleshooting-1">Troubleshooting</a></h2>
 <p>The normal symptoms of a misconfigured TURN server are that calls between
 devices on different networks ring, but get stuck at &quot;call
 connecting&quot;. Unfortunately, troubleshooting this can be tricky.</p>
@@ -1453,6 +1447,21 @@ for example:</p>
 dpkg -i matrix-synapse-py3_1.3.0+stretch1_amd64.deb</p>
 </li>
 </ul>
+<h1 id="upgrading-to-v1340"><a class="header" href="#upgrading-to-v1340">Upgrading to v1.34.0</a></h1>
+<h2 id="room_invite_state_types-configuration-setting"><a class="header" href="#room_invite_state_types-configuration-setting"><code>room_invite_state_types</code> configuration setting</a></h2>
+<p>The <code>room_invite_state_types</code> configuration setting has been deprecated and
+replaced with <code>room_prejoin_state</code>. See the <code>sample configuration file &lt;https://github.com/matrix-org/synapse/blob/v1.34.0/docs/sample_config.yaml#L1515&gt;</code>_.</p>
+<p>If you have set <code>room_invite_state_types</code> to the default value you should simply
+remove it from your configuration file. The default value used to be:</p>
+<p>.. code:: yaml</p>
+<p>room_invite_state_types:
+- &quot;m.room.join_rules&quot;
+- &quot;m.room.canonical_alias&quot;
+- &quot;m.room.avatar&quot;
+- &quot;m.room.encryption&quot;
+- &quot;m.room.name&quot;</p>
+<p>If you have customised this value, you should remove <code>room_invite_state_types</code> and
+configure <code>room_prejoin_state</code> instead.</p>
 <h1 id="upgrading-to-v1330"><a class="header" href="#upgrading-to-v1330">Upgrading to v1.33.0</a></h1>
 <h2 id="account-validity-html-templates-can-now-display-a-users-expiration-date"><a class="header" href="#account-validity-html-templates-can-now-display-a-users-expiration-date">Account Validity HTML templates can now display a user's expiration date</a></h2>
 <p>This may affect you if you have enabled the account validity feature, and have made use of a
@@ -2675,7 +2684,7 @@ be sent. See <a href="usage/../setup/delegate.html">delegate.md</a> for instruct
 <p>Once federation has been configured, you should be able to join a room over
 federation. A good place to start is <code>#synapse:matrix.org</code> - a room for
 Synapse admins.</p>
-<h2 id="troubleshooting-1"><a class="header" href="#troubleshooting-1">Troubleshooting</a></h2>
+<h2 id="troubleshooting-2"><a class="header" href="#troubleshooting-2">Troubleshooting</a></h2>
 <p>You can use the <a href="https://matrix.org/federationtester">federation tester</a>
 to check if your homeserver is configured correctly. Alternatively try the
 <a href="https://matrix.org/federationtester/api/report?server_name=DOMAIN">JSON API used by the federation tester</a>.
@@ -3401,33 +3410,6 @@ acme:
     #
     account_key_file: DATADIR/acme_account.key
 
-# List of allowed TLS fingerprints for this server to publish along
-# with the signing keys for this server. Other matrix servers that
-# make HTTPS requests to this server will check that the TLS
-# certificates returned by this server match one of the fingerprints.
-#
-# Synapse automatically adds the fingerprint of its own certificate
-# to the list. So if federation traffic is handled directly by synapse
-# then no modification to the list is required.
-#
-# If synapse is run behind a load balancer that handles the TLS then it
-# will be necessary to add the fingerprints of the certificates used by
-# the loadbalancers to this list if they are different to the one
-# synapse is using.
-#
-# Homeservers are permitted to cache the list of TLS fingerprints
-# returned in the key responses up to the &quot;valid_until_ts&quot; returned in
-# key. It may be necessary to publish the fingerprints of a new
-# certificate and wait until the &quot;valid_until_ts&quot; of the previous key
-# responses have passed before deploying it.
-#
-# You can calculate a fingerprint from a given TLS listener via:
-# openssl s_client -connect $host:$port &lt; /dev/null 2&gt; /dev/null |
-#   openssl x509 -outform DER | openssl sha256 -binary | base64 | tr -d '='
-# or by checking matrix.org/federationtester/api/report?server_name=$host
-#
-#tls_fingerprints: [{&quot;sha256&quot;: &quot;&lt;base64_encoded_sha256_fingerprint&gt;&quot;}]
-
 
 ## Federation ##
 
@@ -3458,6 +3440,12 @@ acme:
 # on this homeserver. Defaults to 'true'.
 #
 #allow_profile_lookup_over_federation: false
+
+# Uncomment to disable device display name lookup over federation. By default, the
+# Federation API allows other homeservers to obtain device display names of any user
+# on this homeserver. Defaults to 'true'.
+#
+#allow_device_name_lookup_over_federation: false
 
 
 ## Caching ##
@@ -4233,6 +4221,7 @@ room_prejoin_state:
    # - m.room.avatar
    # - m.room.encryption
    # - m.room.name
+   # - m.room.create
    #
    # Uncomment the following to disable these defaults (so that only the event
    # types listed in 'additional_event_types' are shared). Defaults to 'false'.
@@ -5556,7 +5545,8 @@ opentracing:
     #enabled: true
 
     # The list of homeservers we wish to send and receive span contexts and span baggage.
-    # See docs/opentracing.rst
+    # See docs/opentracing.rst.
+    #
     # This is a list of regexes which are matched against the server_name of the
     # homeserver.
     #
@@ -5565,19 +5555,26 @@ opentracing:
     #homeserver_whitelist:
     #  - &quot;.*&quot;
 
+    # A list of the matrix IDs of users whose requests will always be traced,
+    # even if the tracing system would otherwise drop the traces due to
+    # probabilistic sampling.
+    #
+    # By default, the list is empty.
+    #
+    #force_tracing_for_users:
+    #  - &quot;@user1:server_name&quot;
+    #  - &quot;@user2:server_name&quot;
+
     # Jaeger can be configured to sample traces at different rates.
     # All configuration options provided by Jaeger can be set here.
-    # Jaeger's configuration mostly related to trace sampling which
+    # Jaeger's configuration is mostly related to trace sampling which
     # is documented here:
-    # https://www.jaegertracing.io/docs/1.13/sampling/.
+    # https://www.jaegertracing.io/docs/latest/sampling/.
     #
     #jaeger_config:
     #  sampler:
     #    type: const
     #    param: 1
-
-    #  Logging whether spans were started and reported
-    #
     #  logging:
     #    false
 
@@ -5646,6 +5643,21 @@ redis:
   # Optional password if configured on the Redis instance
   #
   #password: &lt;secret_password&gt;
+
+
+# Enable experimental features in Synapse.
+#
+# Experimental features might break or be removed without a deprecation
+# period.
+#
+experimental_features:
+  # Support for Spaces (MSC1772), it enables the following:
+  #
+  # * The Spaces Summary API (MSC2946).
+  # * Restricting room membership based on space membership (MSC3083).
+  #
+  # Uncomment to disable support for Spaces.
+  #spaces_enabled: false
 </code></pre>
 <h2 id="logging-config"><a class="header" href="#logging-config">Logging Config</a></h2>
 <p>Below is a sample logging configuration file. This file controls how your homeserver 
@@ -6211,8 +6223,8 @@ any option values they need here.</li>
 information from.</li>
 </ul>
 </li>
-<li>This method must return a string, which is the unique identifier for the
-user. Commonly the <code>sub</code> claim of the response.</li>
+<li>This method must return a string, which is the unique, immutable identifier
+for the user. Commonly the <code>sub</code> claim of the response.</li>
 </ul>
 </li>
 <li><code>map_user_attributes(self, userinfo, token, failures)</code>
@@ -6238,7 +6250,9 @@ with failures=1. The method should then return a different
 <li>Returns a dictionary with two keys:
 <ul>
 <li><code>localpart</code>: A string, used to generate the Matrix ID. If this is
-<code>None</code>, the user is prompted to pick their own username.</li>
+<code>None</code>, the user is prompted to pick their own username. This is only used
+during a user's first login. Once a localpart has been associated with a
+remote user ID (see <code>get_remote_user_id</code>) it cannot be updated.</li>
 <li><code>displayname</code>: An optional string, the display name for the user.</li>
 </ul>
 </li>
@@ -6334,8 +6348,8 @@ information from.</li>
 redirected to.</li>
 </ul>
 </li>
-<li>This method must return a string, which is the unique identifier for the
-user. Commonly the <code>uid</code> claim of the response.</li>
+<li>This method must return a string, which is the unique, immutable identifier
+for the user. Commonly the <code>uid</code> claim of the response.</li>
 </ul>
 </li>
 <li><code>saml_response_to_user_attributes(self, saml_response, failures, client_redirect_url)</code>
@@ -6362,8 +6376,10 @@ redirected to.</li>
 <p>This method must return a dictionary, which will then be used by Synapse
 to build a new user. The following keys are allowed:</p>
 <ul>
-<li><code>mxid_localpart</code> - The mxid localpart of the new user.  If this is
-<code>None</code>, the user is prompted to pick their own username.</li>
+<li><code>mxid_localpart</code> - A string, the mxid localpart of the new user. If this is
+<code>None</code>, the user is prompted to pick their own username. This is only used
+during a user's first login. Once a localpart has been associated with a
+remote user ID (see <code>get_remote_user_id</code>) it cannot be updated.</li>
 <li><code>displayname</code> - The displayname of the new user. If not provided, will default to
 the value of <code>mxid_localpart</code>.</li>
 <li><code>emails</code> - A list of emails for the new user. If not provided, will
@@ -6950,7 +6966,7 @@ on this particular server - i.e. ones which your account shares a room with, or
 who are present in a publicly viewable room present on the server.</p>
 <p>The directory info is stored in various tables, which can (typically after
 DB corruption) get stale or out of sync.  If this happens, for now the
-solution to fix it is to execute the SQL <a href="usage/configuration/../synapse/storage/databases/main/schema/delta/53/user_dir_populate.sql">here</a>
+solution to fix it is to execute the SQL <a href="https://github.com/matrix-org/synapse/blob/master/synapse/storage/schema/main/delta/53/user_dir_populate.sql">here</a>
 and then restart synapse. This should then start a background task to
 flush the current tables and regenerate the directory.</p>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="message-retention-policies"><a class="header" href="#message-retention-policies">Message retention policies</a></h1>
@@ -7230,7 +7246,11 @@ be imported by the running Synapse.</p>
 <p>which can be given a list of local or remote MXIDs to broadcast known, online user
 presence to (for those users that the receiving user is considered interested in). 
 It does not include state for users who are currently offline, and it can only be
-called on workers that support sending federation.</p>
+called on workers that support sending federation. Additionally, this method must
+only be called from the process that has been configured to write to the
+the <a href="https://github.com/matrix-org/synapse/blob/master/docs/workers.md#stream-writers">presence stream</a>.
+By default, this is the main process, but another worker can be configured to do
+so.</p>
 <h3 id="module-structure"><a class="header" href="#module-structure">Module structure</a></h3>
 <p>Below is a list of possible methods that can be implemented, and whether they are
 required.</p>
@@ -7907,6 +7927,29 @@ systemctl restart matrix-synapse-worker@federation_reader.service
 systemctl enable matrix-synapse-worker@federation_writer.service
 systemctl restart matrix-synapse.target
 </code></pre>
+<h2 id="hardening"><a class="header" href="#hardening">Hardening</a></h2>
+<p><strong>Optional:</strong> If further hardening is desired, the file
+<code>override-hardened.conf</code> may be copied from
+<code>contrib/systemd/override-hardened.conf</code> in this repository to the location
+<code>/etc/systemd/system/matrix-synapse.service.d/override-hardened.conf</code> (the
+directory may have to be created). It enables certain sandboxing features in
+systemd to further secure the synapse service. You may read the comments to
+understand what the override file is doing. The same file will need to be copied
+to
+<code>/etc/systemd/system/matrix-synapse-worker@.service.d/override-hardened-worker.conf</code>
+(this directory may also have to be created) in order to apply the same
+hardening options to any worker processes.</p>
+<p>Once these files have been copied to their appropriate locations, simply reload
+systemd's manager config files and restart all Synapse services to apply the hardening options. They will automatically
+be applied at every restart as long as the override files are present at the
+specified locations.</p>
+<pre><code class="language-sh">systemctl daemon-reload
+
+# Restart services
+systemctl restart matrix-synapse.target
+</code></pre>
+<p>In order to see their effect, you may run <code>systemd-analyze security matrix-synapse.service</code> before and after applying the hardening options to see
+the changes being applied at a glance.</p>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="administration"><a class="header" href="#administration">Administration</a></h1>
 <p>This section contains information on managing your Synapse homeserver. This includes:</p>
 <ul>
@@ -8442,6 +8485,7 @@ server admin: see <a href="usage/administration/admin_api/README.rst">README.rst
 </li>
 <li><a href="usage/administration/admin_api/rooms.html#room-details-api">Room Details API</a></li>
 <li><a href="usage/administration/admin_api/rooms.html#room-members-api">Room Members API</a></li>
+<li><a href="usage/administration/admin_api/rooms.html#room-state-api">Room State API</a></li>
 <li><a href="usage/administration/admin_api/rooms.html#delete-room-api">Delete Room API</a>
 <ul>
 <li><a href="usage/administration/admin_api/rooms.html#parameters-1">Parameters</a></li>
@@ -10360,22 +10404,22 @@ through Jaeger's settings.</p>
 <h2 id="setting-up-opentracing"><a class="header" href="#setting-up-opentracing">Setting up OpenTracing</a></h2>
 <p>To receive OpenTracing spans, start up a Jaeger server. This can be done
 using docker like so:</p>
-<pre><code class="language-sh">docker run -d --name jaeger
+<pre><code class="language-sh">docker run -d --name jaeger \
   -p 6831:6831/udp \
   -p 6832:6832/udp \
   -p 5778:5778 \
   -p 16686:16686 \
   -p 14268:14268 \
-  jaegertracing/all-in-one:1.13
+  jaegertracing/all-in-one:1
 </code></pre>
 <p>Latest documentation is probably at
-<a href="https://www.jaegertracing.io/docs/1.13/getting-started/">https://www.jaegertracing.io/docs/1.13/getting-started/</a></p>
+https://www.jaegertracing.io/docs/latest/getting-started.</p>
 <h2 id="enable-opentracing-in-synapse"><a class="header" href="#enable-opentracing-in-synapse">Enable OpenTracing in Synapse</a></h2>
 <p>OpenTracing is not enabled by default. It must be enabled in the
 homeserver config by uncommenting the config options under <code>opentracing</code>
 as shown in the <a href="development/../../docs/sample_config.yaml">sample config</a>. For example:</p>
 <pre><code class="language-yaml">opentracing:
-  tracer_enabled: true
+  enabled: true
   homeserver_whitelist:
     - &quot;mytrustedhomeserver.org&quot;
     - &quot;*.myotherhomeservers.com&quot;
@@ -10399,7 +10443,7 @@ logged to OpenTracing's logs.</li>
 </ul>
 <h2 id="configuring-jaeger"><a class="header" href="#configuring-jaeger">Configuring Jaeger</a></h2>
 <p>Sampling strategies can be set as in this document:
-<a href="https://www.jaegertracing.io/docs/1.13/sampling/">https://www.jaegertracing.io/docs/1.13/sampling/</a></p>
+<a href="https://www.jaegertracing.io/docs/latest/sampling/">https://www.jaegertracing.io/docs/latest/sampling/</a>.</p>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="synapse-architecture"><a class="header" href="#synapse-architecture">Synapse Architecture</a></h1>
 <p>As of the end of Oct 2014, Synapse's overall architecture looks like:</p>
 <pre><code>    synapse
