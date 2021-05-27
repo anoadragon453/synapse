@@ -2,7 +2,7 @@
 Captcha can be enabled for this home server. This file explains how to do that.
 The captcha mechanism used is Google's ReCaptcha. This requires API keys from Google.
 
-## Getting keys
+## Getting da keys
 
 Requires a site/secret key pair from:
 
