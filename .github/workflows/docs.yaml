@@ -6,7 +6,7 @@ on:
       # For bleeding-edge documentation
       - develop
       # For documentation specific to a release
-      - release-v*
+      - 'release-v*'
 
   workflow_dispatch:
 
