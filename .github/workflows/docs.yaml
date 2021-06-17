@@ -41,6 +41,9 @@ jobs:
         # "1.2" - our major/minor version number.
         run: echo ::set-output name=synapse-version::${GITHUB_REF#refs/heads/release-v}
 
+      - name: Print the current Synapse version
+        run: echo ${{ steps.vars.outputs.synapse-version }}
+
       # Deploy to the version-specific directory
       - name: Deploy release-specific documentation
         # We only carry out this step if we're running on a release branch,
