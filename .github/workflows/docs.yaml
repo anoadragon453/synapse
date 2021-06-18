@@ -47,6 +47,9 @@ jobs:
           echo ::set-output name=branch-version::${GITHUB_REF#refs/heads/release-v}
           echo ::set-output name=synapse-version::`python3 -c 'import synapse; print(synapse.__version__)'`
 
+      - name: Print version vars
+        run: echo ${{ steps.vars.outputs.branch-version}} ${{ steps.vars.outputs.synapse-version }}
+
       # Deploy to the version-specific directory
       - name: Deploy release-specific documentation
         # We only carry out this step if we're running on a release branch,
