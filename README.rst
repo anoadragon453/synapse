@@ -2,7 +2,7 @@
 Synapse |support| |development| |documentation| |license| |pypi| |python|
 =========================================================================
 
-.. contents::
+... contents::
 
 Introduction
 ============
