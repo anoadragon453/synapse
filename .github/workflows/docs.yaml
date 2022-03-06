@@ -55,7 +55,7 @@ jobs:
 
           # finally, set the 'branch-version' var.
           echo "::set-output name=branch-version::$branch"
-          
+
       # Deploy to the target directory.
       - name: Deploy to gh pages
         uses: peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305 # v3.8.0
@@ -63,3 +63,25 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./book
           destination_dir: ./${{ steps.vars.outputs.branch-version }}
+
+  build_version_data:
+    # Figure out which versions of the documentation are available and store them
+    # in 'doc-versions.json'. This will be read by frontend code in order to
+    # provide a version switcher.
+    name: Record known doc versions
+    # Wait for the latest version to be pushed first
+    needs: pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # v3.0.0
+        with:
+          # Check out the github pages branch
+          ref: gh-pages
+
+      - name: Record existing doc versions to a 'versions.json' file
+        run: python3 .ci/scripts/record_doc_versions.py
+
+      - name: Commit and push the updated 'versions.json' file
+        run: |
+          git commit -m "CI: record doc versions"
+          git push
