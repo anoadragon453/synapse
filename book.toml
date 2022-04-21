@@ -35,5 +35,8 @@ additional-css = [
     "docs/website_files/remove-nav-buttons.css",
     "docs/website_files/indent-section-headers.css",
 ]
-additional-js = ["docs/website_files/table-of-contents.js"]
+additional-js = [
+    "docs/website_files/table-of-contents.js",
+    "docs/website_files/version-picker.js",
+]
 theme = "docs/website_files/theme"

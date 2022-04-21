@@ -56,6 +56,14 @@ jobs:
           # finally, set the 'branch-version' var.
           echo "::set-output name=branch-version::$branch"
 
+      # Write the version to a file.
+      # This allows the documentation to know its current version, which
+      # can then be displayed on the page.
+      - name: Write current version to 'current-version.js'
+        run: |
+          echo "window.SYNAPSE_DOCS_VERSION = ${{ steps.vars.outputs.branch-version }}" \
+              > ./book/current-version.js
+
       # Deploy to the target directory.
       - name: Deploy to gh pages
         uses: peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305 # v3.8.0
@@ -64,7 +72,7 @@ jobs:
           publish_dir: ./book
           destination_dir: ./${{ steps.vars.outputs.branch-version }}
 
-  build_version_data:
+  build-version-data:
     # Figure out which versions of the documentation are available and store them
     # in 'doc-versions.json'. This will be read by frontend code in order to
     # provide a version switcher.
@@ -81,7 +89,8 @@ jobs:
       - name: Record existing doc versions to a 'versions.json' file
         run: python3 .ci/scripts/record_doc_versions.py
 
-      - name: Commit and push the updated 'versions.json' file
+      - name: Commit and push an updated 'versions.json'
         run: |
+          git add versions.json
           git commit -m "CI: record doc versions"
           git push
