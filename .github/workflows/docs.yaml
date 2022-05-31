@@ -79,6 +79,8 @@ jobs:
     name: Record known doc versions
     # Wait for the latest version to be pushed first
     needs: pages
+    # Only record available version when a new non-rc release tag is pushed
+    if: ${{ startsWith(github.ref, 'refs/tags/release-v') && !contains(github.ref, 'rc' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # v3.0.0
